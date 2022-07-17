@@ -1,6 +1,6 @@
 create database QLthidau;
 create table Department(DepartmentID int primary key AUTO_INCREMENT, DepartmentName varchar(50));
-create table Posotion(PosotionID int, PosotionName ENUM('DEV','TEST','SCUM MASTER','PM'));
+create table Posotion(PosotionID int primary key AUTO_INCREMENT, PosotionName ENUM('DEV','TEST','SCUM MASTER','PM'));
 create table Account(AccountID int primary key AUTO_INCREMENT, Email varchar(50), Username varchar(50), FullName varchar(50),DepartmentID int,PositionID int, CreateDate Date);
 create table Group1(GroupID int primary key AUTO_INCREMENT, GroupName varchar(50),CreatorID int,CreateDate date);
 create table GroupAccount(GroupID int, AccountID int,JoinDate date);
