@@ -7,8 +7,8 @@ create table GroupAccount(GroupID int, AccountID int,JoinDate date);
 create table TypeQuestion(TypeID int primary key AUTO_INCREMENT, TypeName varchar(50));
 create table CategoryQuestion(CategoryID int primary key AUTO_INCREMENT, CategoryName varchar(50));
 create table Question(QuestionID int primary key AUTO_INCREMENT, Content varchar(50),CategoryID int,TypeID int,CreatorID int, CreateDate date);
-create table Answer(AnswerID int primary key AUTO_INCREMENT, Content varchar(50),QuestionID int,isCorrect enum('true','false'));
-create table Exam(ExamID int primary key AUTO_INCREMENT, Code varchar(50),Title varchar(50),CategoryID int,Duration time, CreatorID int, CreateDate date);
+create table Answer(AnswerID int primary key AUTO_INCREMENT, Content varchar(50),QuestionID int,isCorrect varchar(50));
+create table Exam(ExamID int primary key AUTO_INCREMENT, Code varchar(50),Title varchar(50),CategoryID int,Duration int, CreatorID int, CreateDate date);
 create table ExamQuestion(ExamID int, QuestionID int);
 
 
