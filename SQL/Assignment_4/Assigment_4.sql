@@ -19,33 +19,34 @@ join account as a
 on d.DepartmentID=a.DepartmentID
 group by a.DepartmentID having count(a.AccountID) >3;
 -- câu 5:
-select eq.QuestionID,q.Content,count(eq.QuestionID) 
-from examquestion as eq
-join question as q
-on q.QuestionID=eq.QuestionID
-group by eq.QuestionID
-order by count(eq.QuestionID) desc
-limit 1;
--- câu 6:
-select c.CategoryName, q.Content,count(c.CategoryID)
+SELECT E.QuestionID, Q.Content FROM examquestion E
+INNER JOIN question Q ON Q.QuestionID = E.QuestionID
+GROUP BY E.QuestionID
+HAVING count(E.QuestionID) = (SELECT MAX(countQues) as maxcountQues FROM (
+SELECT COUNT(E.QuestionID) AS countQues FROM examquestion E
+GROUP BY E.QuestionID) AS countTable);
+
+-- câu 6: Thông kê mỗi category Question được sử dụng trong bao nhiêu Question
+select c.CategoryName, q.Content,count(q.QuestionID) as soluong, group_concat(q.QuestionID) as nhom
 from categoryquestion as c 
-join question as q
+left join question as q
 on c.CategoryID=q.CategoryID
-group by c.CategoryID;
--- câu 7:
-select q.Content,count(eq.QuestionID)
+group by q.CategoryID;
+-- câu 7:Thông kê mỗi Question được sử dụng trong bao nhiêu Exam
+select q.Content,count(eq.ExamID) as soluong, group_concat(eq.ExamID) as nhom
 from  examquestion as eq
-join question as q
+left join question as q
 on eq.QuestionID=q.QuestionID
-group by eq.QuestionID ; 
--- câu 8:
+group by q.QuestionID ; 
+-- câu 8: Lấy ra Question có nhiều câu trả lời nhất
 select q.Content,count(a.AnswerID)
 from question as q
 join answer as a
 on q.QuestionID=a.QuestionID
 group by a.AnswerID
-order by count(a.AnswerID) desc
-limit 1;
+having count( a.AnswerID)= (select max(countQues)as maxcountQues FROM (
+SELECT COUNT(a.AnswerID) AS countQues FROM answer a
+GROUP BY a.AnswerID) AS countTable);
 -- câu 9:
 SELECT g.GroupName ,count(ga.AccountID)
 from `group` as g
@@ -56,34 +57,44 @@ on a.AccountID=ga.AccountID
 group by ga.AccountID
 order by count(ga.AccountID);
 -- câu 10:
-select p.PositionName 
-from position as p 
-join account as a
-on p.PositionID=a.PositionID 
-group by a.AccountID
-order by count(a.AccountID) asc
-limit 1;
+SELECT p.PositionName,count(a.PositionID) as soluong
+FROM position p JOIN account a ON p.PositionID=a.PositionID
+GROUP BY a.PositionID
+HAVING count(a.PositionID)=(SELECT min(ca) FROM
+(SELECT count(ac.PositionID) AS ca FROM position p LEFT join `account` as ac on p.PositionID = ac.PositionID
+GROUP BY p.PositionID) AS cp);
+
 -- câu 11:
-select DepartmentName,p.PositionName, count(a.PositionID)
+select d.DepartmentName,p.PositionName, count(a.AccountID)
 from position as p 
-join account as a
+ join account as a
 on p.PositionID=a.PositionID 
-join department as d
+ join department as d
 on a.DepartmentID=d.DepartmentID
-group by a.PositionID;
--- câu 12:
+group by a.PositionID,d.DepartmentID;
+-- câu 12: Lấy thông tin chi tiết của câu hỏi bao gồm: thông tin cơ bản của question, loại câu hỏi, ai là người tạo ra câu hỏi, câu trả lời là gì,
 select q.*,t.TypeName,a.Content from question as q
 join typequestion as t
 on q.TypeID=t.TypeID
 join answer as a
 on a.QuestionID=q.QuestionID;
 -- câu 13:
-select t.TypeName, count(q.TypeID) 
-from question as q 
-join typequestion as t
+select t.TypeName, count(t.TypeID) 
+from typequestion  as t 
+left join question as q
 on q.TypeID=t.TypeID
-group by q.TypeID;
--- câu 14:
+group by t.TypeID;
+-- câu 14: Lấy ra group không có account nào
+SELECT * 
+FROM `group` as g
+LEFT JOIN groupaccount ga on g.GroupID=ga.GroupID
+GROUP BY g.GroupID HAVING count(ga.GroupID)=0;
+-- câu 16: Lấy ra question không có answer nào
+SELECT * 
+from question as q
+ LEFT join answer as a
+on q.QuestionID=a.QuestionID
+where a.Content is Null;
 -- câu 17:
 select *
 from account as a
@@ -106,3 +117,4 @@ SELECT
 JOIN `group` g
 ON ga.GroupID = g.GroupID
 GROUP BY ga.GroupID HAVING count(ga.GroupID) < 7;
+
